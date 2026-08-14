@@ -1,0 +1,58 @@
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Python environments, caches, and test artifacts
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+ENV/
+.env
+.env.*
+
+# Local logs and temporary files
+*.log
+logs/
+tmp/
+*.tmp
+*.temp
+
+# External input data (record provenance and checksums, but do not commit reads)
+/input/
+/reference/
+
+# MTPLite generated artifacts
+/jellyfish_data/
+/barcode_21mers/
+/rid_maps/
+/stats/
+/bins/
+/universe/
+/bridges_v1.1/
+/helper/
+/output/
+
+# Common generated genomics/index artifacts when created outside the directories above
+*.idx
+*.data
+*.pkl
+*.count
+*.histo
+*.jf
+*.gfa
+*.fai
+*.bai
+
+AGENTS.md
