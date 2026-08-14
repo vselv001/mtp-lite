@@ -132,8 +132,8 @@ def select_anchors(universe, rid_to_int, ctx, update_every=100000):
 
 
 def anchor_executor():
-    base_dir = os.path.join(os.path.expanduser("~"), "MTPLite")
-    k = 21
+    base_dir = "path/to/your/project_directory"  # Replace with your MTPLite project directory
+    k = 21  # Replace with the k-mer size used for unikmer extraction
 
     universe_pkl = os.path.join(base_dir, "universe", "universe.pkl")
     rid_int_map_pkl = os.path.join(base_dir, "rid_maps", "rid_to_int.pkl")

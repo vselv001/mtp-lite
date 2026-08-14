@@ -174,11 +174,11 @@ def barcode_reads_flat(unikmer_map, rid_to_int, read_file, k, idx_path, data_pat
 # ── entry point ─────────────────────────────────────────────────────
 
 def mapper_executor():
-    k = 21
-    base_dir = os.path.join(os.path.expanduser("~"), "MTPLite")
+    k = 21  # Replace with the k-mer size used for unikmer extraction
+    base_dir = "path/to/your/project_directory"  # Replace with your MTPLite project directory
 
-    unikmer_file = os.path.join(base_dir, "jellyfish_data", "prefix.unikmers")
-    read_file = os.path.join(base_dir, "input", "hifi_1000x_chr1.fastq")
+    unikmer_file = "path/to/your/input_unikmers.txt"  # Replace with the path to your extracted unikmers
+    read_file = "path/to/your/input_reads.fasta"  # Replace with the path to your input reads file
     rid_map_file = os.path.join(base_dir, "rid_maps", "rid_to_int.pkl")
     int_rid_map_file = os.path.join(base_dir, "rid_maps", "int_to_rid.pkl")
     stats_pkl = os.path.join(base_dir, "stats", "read_stats.pkl")

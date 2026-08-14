@@ -34,8 +34,8 @@ def writePickle(data, outFile):
         pkl.dump(data, f)
 
 def main():
-    base_dir = os.path.join(os.path.expanduser("~"), "MTPLite")
-    k = 21
+    base_dir = "path/to/your/project_directory"  # Replace with your MTPLite project directory
+    k = 21  # Replace with the k-mer size used for unikmer extraction
 
     idx_path = os.path.join(base_dir, f"barcode_{k}mers", "read_unikmer_map.idx")
     data_path = os.path.join(base_dir, f"barcode_{k}mers", "read_unikmer_map.data")

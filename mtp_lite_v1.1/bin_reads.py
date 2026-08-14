@@ -162,15 +162,15 @@ def bin_reads_pipeline(read_stats, coverage, genome_size, dist_csv, bin_pkl, bin
 
 
 if __name__ == "__main__":
-    base_dir = os.path.join(os.path.expanduser("~"), "MTPLite")
+    base_dir = "path/to/your/project_directory"  # Replace with your MTPLite project directory
 
     read_stats_pkl = os.path.join(base_dir, "stats", "read_stats.pkl")
     dist_csv = os.path.join(base_dir, "stats", "unikmer_distribution.csv")
     bin_pkl = os.path.join(base_dir, "bins", "binned_reads.pkl")
     bin_csv = os.path.join(base_dir, "bins", "binned_reads.csv")
 
-    coverage = 1000
-    genome_size = 14_550_000
+    coverage = 1000  # Replace with the estimated sequencing coverage
+    genome_size = 14_550_000  # Replace with the estimated genome size in base pairs
 
     read_stats = loadPickle(read_stats_pkl)
     bin_reads_pipeline(read_stats, coverage, genome_size, dist_csv, bin_pkl, bin_csv)

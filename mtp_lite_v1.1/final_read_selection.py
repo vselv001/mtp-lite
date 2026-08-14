@@ -119,18 +119,19 @@ def collect_from_bins(binned_obj, bins=range(6)):
 
 
 def main():
-    base_dir = os.path.join(os.path.expanduser("~"), "MTPLite")
-    output_dir = os.path.join(base_dir, "output")
-    mtp_output_dir = os.path.join(output_dir, "mtpv1.1")
+    base_dir = "path/to/your/project_directory"  # Replace with your MTPLite project directory
+    output_dir = "path/to/your/output_directory"  # Replace with the desired output directory
+    output_prefix = "prefix_for_output_files"  # Replace with the desired prefix for output files
+    mtp_output_dir = os.path.join(output_dir, output_prefix)
     helper_dir = os.path.join(base_dir, "helper")
 
-    read_file = os.path.join(base_dir, "input", "hifi_1000x_chr1.fastq")
+    read_file = "path/to/your/input_reads.fasta"  # Replace with the path to your input reads file
     anchors_pkl = os.path.join(output_dir, "anchors.pkl")
     bridges_dir = os.path.join(base_dir, "bridges_v1.1")
     bridges_pkl = os.path.join(bridges_dir, "bridges.pkl")
     direct_bridges_pkl = os.path.join(bridges_dir, "direct_bridges.pkl")
     binned_reads_pkl = os.path.join(base_dir, "bins", "binned_reads.pkl")
-    final_reads_fasta = os.path.join(output_dir, "mtpv1.1.fasta")
+    final_reads_fasta = os.path.join(output_dir, f"{output_prefix}.fasta")
 
     ensure_empty_dir(mtp_output_dir)
 

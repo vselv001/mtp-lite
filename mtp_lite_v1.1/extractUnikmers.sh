@@ -6,26 +6,24 @@
 # conda install -c bioconda jellyfish
 # conda install -c conda-forge xlsxwriter
 
-# execution command for this file:
-# bash extractUnikmers.sh prefix k
-
 # ------- SPECIFICATION
-DIR="/home/vselv001/MTPLite"
-k=$2 # value of k for k-mers; in this study k=21
-THREADS=32
+DIR="path/to/your/project_directory"  # Replace with your MTPLite project directory
+READ_FILE="path/to/your/input_reads.fasta"  # Replace with the path to your input reads file
+PREFIX="prefix_for_output_files"  # Replace with the desired prefix for output files
+KMER_SIZE="number_of_bases_per_kmer"  # Replace with the k-mer size to use
+THREADS="number_of_threads"  # Replace with the number of threads you want to use
 DATA=$DIR"/jellyfish_data"
 
 mkdir -p $DATA
 
-READ_FILE=$DIR"/input/hifi_1000x_chr1.fastq"
-OUT_COUNT=$DATA/$1.count
-OUT_HISTO=$DATA/$1.histo
-OUT_XCEL=$DATA/$1.xlsx
-UNIKMERS=$DATA/$1.unikmers
+OUT_COUNT=$DATA/$PREFIX.count
+OUT_HISTO=$DATA/$PREFIX.histo
+OUT_XCEL=$DATA/$PREFIX.xlsx
+UNIKMERS=$DATA/$PREFIX.unikmers
 
 # the count and histo commands together generate the frequency distribution of kmers
 # in the $OUT_HISTO file 
-jellyfish count -m $k -C -o $OUT_COUNT -c 3 -s 10000000 --disk -t $THREADS $READ_FILE
+jellyfish count -m $KMER_SIZE -C -o $OUT_COUNT -c 3 -s 10000000 --disk -t $THREADS $READ_FILE
 jellyfish histo -o $OUT_HISTO -v $OUT_COUNT
 
 # the python script generates an excel (.xlsx) file to visualize the distribution
