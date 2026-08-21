@@ -1,25 +1,44 @@
 # MTPLite documentation
 
-This directory contains the documentation needed to reproduce or adapt the
-MTPLite v1.1 research workflow. Read the pages in the following order for a
-new installation.
+This documentation describes the MTPLite v1.1 research workflow as it is
+mirrored in this repository. It distinguishes the recorded *C. elegans*
+chromosome I experiment from guidance for adapting the workflow to a new
+dataset.
 
-| Document | When to use it |
-| --- | --- |
-| [Setup guide](SETUP.md) | Install the recorded software environment, prepare inputs, and configure the current path-bound scripts. |
-| [How to run](HOW_TO_RUN.md) | Execute the pipeline in dependency order and evaluate an assembly with QUAST. |
-| [Technical design notes](<MTPLite v1.1.md>) | Understand the barcode representation, selection algorithms, and v1.1 parameters. |
-| [Original run order](run_order.md) | Consult the concise command sequence preserved from the initial experiment. |
-| [QUAST result report](../report.pdf) | Review the evidence for the reported v1.1 assembly results. |
+## Reading paths
 
-## Documentation scope
+### Reproduce or adapt a run
 
-The checked-in code is a mirror of a research workflow. It is intentionally
-documented as implemented: entry-point scripts use dataset-specific values and
-hard-coded project paths rather than command-line options. The setup guide
-identifies every path that must be adapted before running on another machine.
+1. [Setup](SETUP.md) — create the recorded environment and replace every
+   configuration placeholder.
+2. [Reproducibility guide](REPRODUCIBILITY.md) — capture the data, parameter,
+   software, hardware, and command record for the run.
+3. [How to run](HOW_TO_RUN.md) — execute the stages in dependency order and
+   check the expected artifacts.
+4. [Technical notes](<MTPLite v1.1.md>) — review the algorithm and parameter
+   rationale before changing a setting.
 
-Raw reads, reference sequences, intermediate binary stores, and assembly
-outputs are excluded from version control by the root [`.gitignore`](../.gitignore).
-Keep their provenance, checksums, commands, and software versions alongside
-each experiment outside the repository or in a tracked experiment manifest.
+### Understand the reference study
+
+- [Technical notes and results](<MTPLite v1.1.md>) explain the barcode-based
+  method and place the reported result in context.
+- [report.pdf](../report.pdf) is the retained QUAST output for the v1.1
+  assembly evaluated against *C. elegans* chromosome I reference NC_003279.8.
+- [Original run order](run_order.md) preserves a concise historical command
+  record. It is not current configuration guidance.
+
+## Documentation principles
+
+- **Configured, not turnkey.** The scripts contain intentionally visible
+  placeholders for paths, filenames, prefixes, and resource settings. Complete
+  the setup checklist before running any stage. In particular, use one project
+  artifact root and pass the selected-read FASTA from final selection to
+  `assembly.sh` exactly as written.
+- **Evidence-scoped.** The reported metrics apply only to the recorded input,
+  reference, toolchain, and parameters.
+- **Reproducible by record.** Large data and generated artifacts are excluded
+  from version control. Preserve their provenance, checksums, commands, logs,
+  tool versions, and output checksums with each experiment.
+- **Mirror-aware.** This repository is not the source of truth for the
+  implementation. See [CONTRIBUTING.md](../CONTRIBUTING.md) for maintenance
+  expectations.

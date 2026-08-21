@@ -1,18 +1,37 @@
-1. bash extractUnikmers.sh prefix 21
-2. nohup python -u read_unikmer_map.py > read_unikmer_map.log 2>&1 &
-3. nohup python -u bin_reads.py > bin_reads.log 2>&1 &
-4. nohup python -u universe.py > universe.log 2>&1 &
-5. nohup python -u anchor.py > anchor.log 2>&1 &
-6. nohup python -u direct_bridge.py > direct_bridge.log 2>&1 &
-7. nohup python -u indexer.py > indexer.log 2>&1 &
-8. nohup python -u barcode_assembler.py > barcode_assembler.log 2>&1 &
-9. nohup python -u final_read_selection.py > final_read_selection.log 2>&1 &
-10. bash assembly.sh
+# Historical run-order record
 
-cd ..
+This page preserves the concise sequence associated with the original v1.1
+experiment. It is included as provenance, not as an executable protocol. The
+historical shell invocation used positional arguments and an absolute project
+path; the current mirrored shell scripts use configured variables instead.
 
-11. quast.py /24-2/home/vselv001/MTPLite/output/mtpv1.1/mtpv1.1.asm.fasta \
-  -r /24-2/home/vselv001/MTPLite/reference/chr1.fasta \
-  -o /24-2/home/vselv001/MTPLite/output/quast_mtpv1.1
+Use [How to run](HOW_TO_RUN.md) for current execution guidance and
+[Setup](SETUP.md) to configure the entry points first.
 
-So far @mtp_lite_v1.1 is headed towards the correct direction. The less contigs the better.
+## Recorded stage order
+
+1. Extract frequency-filtered unikmers with `extractUnikmers.sh`.
+2. Build read-ID maps, read barcodes, and per-read statistics with
+   `read_unikmer_map.py`.
+3. Bin reads with `bin_reads.py`.
+4. Build the observed unikmer universe with `universe.py`.
+5. Select anchors with `anchor.py`.
+6. Detect direct bridges with `direct_bridge.py`.
+7. Build the head index with `indexer.py`.
+8. Search anchor-to-anchor paths with `barcode_assembler.py`.
+9. Select and export reads with `final_read_selection.py`.
+10. Assemble selected reads with `assembly.sh`.
+11. Evaluate the primary-contig assembly with QUAST against the target
+    reference.
+
+The original run launched several Python stages with `nohup`, but the stages
+are dependency-ordered and should not be treated as parallel tasks. Confirm
+each output and its log before continuing to the next stage.
+
+## Historical context
+
+The original notes describe the goal as reducing contig count in the selected
+read assembly. The documented final configuration retained 14,176 reads and
+produced three primary contigs under the recorded reference-based evaluation.
+See [methods and reference results](<MTPLite v1.1.md>) and
+[report.pdf](../report.pdf) for the evidence and limitations.

@@ -1,49 +1,39 @@
-# Setup guide
+# Setup
 
-This guide prepares a system to reproduce the MTPLite v1.1 workflow. It
-covers the recorded environment and the configuration required by the current
-scripts; it does not change pipeline parameters or claim portability that the
-implementation does not yet provide.
+This guide prepares a system to run or adapt the MTPLite v1.1 research
+workflow. It documents the environment that supported the recorded
+*C. elegans* chromosome I study. It does not turn the mirrored scripts into a
+general-purpose command-line application.
 
-## 1. System requirements
+## 1. Assess suitability
 
-The recorded v1.1 run used Linux, Bash, Conda, fast local storage, and the
-following software.
+MTPLite is intended for high-coverage PacBio HiFi data and targeted assembly.
+The v1.1 workflow operates over large, on-disk barcode and head-index files.
+The recorded index contained roughly 71.2 million unique 11-ID keys and
+17.2 GB of packed read-ID data. Index construction also accumulates keys in
+memory. Use fast local storage and provision RAM conservatively before starting
+a deep-coverage run.
 
-| Component | Recorded version | Purpose |
-| --- | ---: | --- |
-| Python | 3.8.20 | Runs the pipeline programs. |
-| NumPy | 1.24.3 | Vectorized unikmer-coverage operations. |
-| Biopython | 1.78 | FASTA/FASTQ parsing and FASTA writing. |
-| XlsxWriter | 3.1.1 | Jellyfish histogram workbook output. |
-| Jellyfish | 2.2.10 | Canonical k-mer counting and unikmer extraction. |
-| hifiasm | 0.25.0 | HiFi read assembly. |
-| QUAST | 5.3.0 | Reference-based assembly evaluation. |
+The source code is a mirror and contains user-editable placeholders. Treat a
+modified parameter set or another organism as a separate experiment, not as a
+direct reproduction of the v1.1 result.
 
-The workflow also calls `awk`, `sed`, `cut`, and `xargs`. QUAST invokes
-minimap2 internally; its separately installed version was not recorded.
+## 2. Create the recorded environment
 
-The head-index construction is the main resource bottleneck. In the supplied
-experiment it produced roughly 71.2 million unique 11-ID keys and 17.2 GB of
-packed read-ID data, in addition to the in-memory accumulator used during
-index construction. Provision substantial RAM and fast local scratch/storage
-before starting a deep-coverage run.
-
-## 2. Create the recorded software environment
-
-From the repository root, create the Conda environment described in the
-version-controlled [`environment.yml`](../environment.yml):
+From the repository root, create the version-pinned Conda environment:
 
 ```bash
 conda env create -f environment.yml
 conda activate mtplite-v1.1
 ```
 
-For an existing environment, install the same packages and versions from that
-file. The versions reflect the successful v1.1 experiment; validate any
-version changes before treating their results as comparable.
+The recorded toolchain is Python 3.8.20, NumPy 1.24.3, Biopython 1.78,
+XlsxWriter 3.1.1, Jellyfish 2.2.10, hifiasm 0.25.0, and QUAST 5.3.0. Bash and
+standard Unix utilities (`awk`, `sed`, `cut`, and `xargs`) are also required.
+QUAST invokes minimap2 internally; a standalone minimap2 version was not
+recorded.
 
-Verify the executable and Python dependencies before investing in a long run:
+Verify the available environment before a long run:
 
 ```bash
 python --version
@@ -53,76 +43,93 @@ quast.py --version
 python -c "import Bio, numpy, xlsxwriter; print('Python dependencies available')"
 ```
 
-## 3. Prepare the project and data layout
+If the solved environment differs from the recorded versions, save the
+resolved `conda list --explicit` output with the experiment record.
 
-The current configuration expects this project-root layout:
+## 3. Prepare data outside version control
+
+Create or link data directories at the project root. The names below are a
+convention only; they must agree with the values you place in the scripts.
 
 ```text
 MTPLite/
 ├── input/
-│   └── hifi_1000x_chr1.fastq
+│   └── reads.fastq              # PacBio HiFi FASTQ or FASTA
 ├── reference/
-│   └── chr1.fasta
+│   └── target.fasta             # used only for reference-based evaluation
 ├── mtp_lite_v1.1/
-└── ... pipeline-generated directories ...
+└── ... generated workflow directories
 ```
 
-`hifi_1000x_chr1.fastq` is the PacBio HiFi read input. `chr1.fasta` is used
-only by the final QUAST evaluation. The read-mapping stage accepts
-uncompressed FASTQ or FASTA according to the file extension; the final
-selection stage also supports gzip-compressed FASTQ/FASTA. The configured
-v1.1 run uses an uncompressed FASTQ.
+The root `.gitignore` excludes raw reads, reference sequences, intermediate
+binary stores, and assembly outputs. Before running, capture the input source,
+accession or download date, file checksum, and reference identifier in the
+[reproducibility record](REPRODUCIBILITY.md).
 
-The root `.gitignore` excludes `input/`, `reference/`, and every large
-generated output directory. Do not commit raw sequencing data or binary
-indices. For each experiment, retain a provenance record with the input source,
-download date, checksums, reference identifier, and any parameter changes.
+`read_unikmer_map.py` accepts uncompressed reads: a path ending in `.fastq` is
+parsed as FASTQ and any other filename is parsed as FASTA. In contrast,
+`final_read_selection.py` also supports `.fastq.gz`, `.fasta.gz`, and `.fa.gz`.
+Use an uncompressed `.fastq` or `.fasta` path consistently throughout the
+workflow.
 
-## 4. Configure the current scripts
+## 4. Configure every entry point
 
-MTPLite v1.1 is not yet parameterized by a config file or command-line
-arguments. The Python entry points derive their root directory as
-`~/MTPLite`, while the shell scripts retain the original absolute path
-`/home/vselv001/MTPLite`. Configure all of them to one consistent project root
-before running on a different account or checkout path.
+The repository does not provide a central configuration file. Replace the
+placeholder strings and study-specific values in the following files before
+execution. Use absolute paths to avoid ambiguity. Set `DIR` in
+`extractUnikmers.sh`, every Python `base_dir`, and
+`barcode_assembler.py`'s `DEFAULT_BASE_DIR` to the same project artifact root.
+The `--base-dir` option remains available as an explicit override for
+`barcode_assembler.py`.
 
-| Files | What to update |
+| File(s) | Required configuration |
 | --- | --- |
-| `read_unikmer_map.py`, `bin_reads.py`, `universe.py`, `anchor.py`, `direct_bridge.py`, `indexer.py`, `barcode_assembler.py`, `final_read_selection.py` | The `base_dir` assignment in each entry point. |
-| `extractUnikmers.sh` | `DIR`, which determines input and Jellyfish-output paths. |
-| `assembly.sh` | `READ_FILE` and `OUT_DIR`. |
+| `extractUnikmers.sh` | `DIR`, `READ_FILE`, `PREFIX`, `KMER_SIZE`, and `THREADS` |
+| `read_unikmer_map.py` | `base_dir`, `k`, `unikmer_file`, and `read_file` |
+| `bin_reads.py` | `base_dir`, estimated `coverage`, and `genome_size` |
+| `universe.py`, `anchor.py`, `direct_bridge.py`, `indexer.py` | `base_dir` and the applicable k-mer / path-search settings |
+| `barcode_assembler.py` | `DEFAULT_BASE_DIR` and the applicable path-search settings; optionally override the root with `--base-dir` |
+| `final_read_selection.py` | `base_dir`, `output_dir`, `output_prefix`, and `read_file` |
+| `assembly.sh` | `READ_FILE`, `OUT_DIR`, `PREFIX`, and `THREADS` |
 
-Keep the configured filename prefixes consistent across stages. In particular,
-the first stage writes `jellyfish_data/prefix.unikmers`, and
-`read_unikmer_map.py` expects that exact filename.
+For the recorded v1.1 experiment, the key values were a nucleotide k-mer size
+of 21, expected coverage of 1,000×, target genome size of 14,550,000 bp,
+11-ID barcode index keys, a 100-ID direct-bridge minimum overlap, and 40
+hifiasm threads. The [technical notes](<MTPLite v1.1.md#recorded-v11-configuration>)
+list the complete recorded settings and their roles.
 
-The documented v1.1 parameters target a 14.55 Mbp region at 1,000× coverage.
-Before using another target, review the k-mer length, expected genome size,
-coverage, binning settings, bridge threshold, and index/BFS limits in the
-[technical design notes](<MTPLite v1.1.md>). Changing those values makes a new
-experiment and should be recorded with its output.
+The `PREFIX` in `extractUnikmers.sh` determines the unikmer filename. Set
+`read_unikmer_map.py`'s `unikmer_file` to that exact generated path. Similarly,
+the final-selection and assembly prefixes must agree with each other and with
+the later QUAST command. Set `final_read_selection.py`'s `output_dir` to
+`<project-root>/output`: this is where `anchor.py` creates `anchors.pkl`. The
+selected reads will therefore be `<project-root>/output/<prefix>.fasta`; copy
+that exact path into `assembly.sh` as `READ_FILE`. `OUT_DIR` may be a separate
+assembly-results directory.
 
-## 5. Preflight check
+## 5. Preflight review
 
-Before a full run, confirm that the configured input is readable and that the
-repo will not accidentally stage large artifacts:
+Before starting a full run, verify that no placeholder remains:
 
 ```bash
+rg -n '^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=[[:space:]]*"(path/to/your|prefix_for_output_files|number_of_)' mtp_lite_v1.1
 git status --short
-git check-ignore -v input/hifi_1000x_chr1.fastq reference/chr1.fasta
+git check-ignore -v input/reads.fastq reference/target.fasta
 ```
 
-Then move to the script directory. The Python programs import local modules,
-so run them from `mtp_lite_v1.1/` as shown in the [run guide](HOW_TO_RUN.md).
+The first command should return no active configuration placeholders. The last
+command should show that research data are ignored rather than staged. Run the
+Python programs from `mtp_lite_v1.1/` so their local module imports resolve.
 
 ## 6. Re-run safety
 
-Most stages overwrite their own files. Two operations remove existing
-directories before recreating them:
+The workflow is staged but not transaction-safe. Keep an experiment-specific
+directory or archive results before re-running. In particular:
 
-- `indexer.py` removes `barcode_21mers/head_index/`.
-- `final_read_selection.py` empties `output/mtpv1.1/`.
+- `indexer.py` removes and rebuilds `barcode_21mers/head_index/`.
+- `final_read_selection.py` empties its configured assembly-output directory
+  before writing the selected-read FASTA.
 
-Archive results you want to preserve before rerunning either stage. Do not run
-dependent stages concurrently: the numbered sequence in the run guide is a
-dependency order.
+Do not run dependent stages concurrently. Follow the
+[dependency-ordered run guide](HOW_TO_RUN.md), and rebuild downstream outputs
+after modifying an upstream configuration or input.
