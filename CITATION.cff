@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use MTPLite, please cite this software record and report the exact commit and experimental configuration."
+title: "MTPLite"
+type: software
+version: "1.1"
+authors:
+  - family-names: "Selvarajan"
+    given-names: "Vimal"
+repository-code: "https://github.com/vselv001/mtp-lite"
+license: "MIT"

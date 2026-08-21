@@ -43,6 +43,7 @@ tmp/
 /bridges_v1.1/
 /helper/
 /output/
+/mtp_lite_v1.1/runs/
 
 # Common generated genomics/index artifacts when created outside the directories above
 *.idx
